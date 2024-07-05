@@ -1,17 +1,20 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { mongooseOptions } from './mongoose.options';
 
 @Module({
   imports: [
     ConfigModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('DATABASE_URL'),
-        ...mongooseOptions,
-      }),
+      useFactory: async (configService: ConfigService) => {
+        const databaseUrl = configService.get<string>('DATABASE_URL');
+        console.log('DATABASE_URL:', databaseUrl); // Log the database URL
+        return {
+          uri: databaseUrl,
+          // ...mongooseOptions,
+        };
+      },
       inject: [ConfigService],
     }),
   ],
