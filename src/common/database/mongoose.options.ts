@@ -1,20 +1,16 @@
-export const mongooseOptions: any = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  toJSON: {
+import { Schema } from 'mongoose';
+
+export function applyMongooseGlobalPlugins(schema: Schema) {
+  schema.set('toJSON', {
     virtuals: true,
-    transform: (doc, ret) => {
-      ret.id = ret._id.toString();
+    transform: (_, ret) => {
+      ret.id = ret._id;
       delete ret._id;
       delete ret.__v;
+      return ret;
     },
-  },
-  toObject: {
+  });
+  schema.set('toObject', {
     virtuals: true,
-    transform: (doc, ret) => {
-      ret.id = ret._id.toString();
-      delete ret._id;
-      delete ret.__v;
-    },
-  },
-};
+  });
+}

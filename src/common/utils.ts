@@ -1,19 +1,77 @@
 import {
   ClientOptions,
+  ClientProxy,
   ClientProxyFactory,
   MicroserviceOptions,
   Transport,
 } from '@nestjs/microservices';
-import { ConfigService } from '@nestjs/config';
-import { NestApplicationContextOptions } from '@nestjs/common/interfaces/nest-application-context-options.interface';
-import { INestMicroservice } from '@nestjs/common';
+import { BadRequestException, INestMicroservice } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { NestApplicationContextOptions } from '@nestjs/common/interfaces/nest-application-context-options.interface';
+import { timeout } from 'rxjs';
+
+enum EUserType {
+  ADMIN = 'admin',
+  USER = 'user',
+}
+
+interface IJwtPayload {
+  sub: string;
+  type: EUserType;
+}
+
+interface SendRequestParams<T> {
+  data: T;
+  user?: IJwtPayload | null;
+  service: string;
+  cmd: string;
+  client: ClientProxy;
+}
+
+interface ITCPPayload<T> {
+  data: T;
+  user: IJwtPayload;
+}
+
+export async function sendRequest<T, U>(
+  cmd: string,
+  data: U,
+  user: IJwtPayload,
+  service: string,
+  client: ClientProxy,
+): Promise<T> {
+  return await client
+    .send<T, ITCPPayload<U>>({ service, cmd }, { data, user })
+    .pipe(timeout(1000))
+    .toPromise()
+    .catch((e) => {
+      console.error(
+        e,
+        e.code,
+        e.cause,
+        'error in sendRequest',
+        service,
+        cmd,
+        data,
+        user,
+      );
+      throw new BadRequestException({
+        message: 'Server Error',
+        code: 500,
+        service: service,
+        cmd: cmd,
+      });
+    });
+}
 
 export const TCPConfig = async (
   module: any,
   service: string,
 ): Promise<INestMicroservice> => {
-  const serviceHostPort = process.env[`${service.toUpperCase()}_SERVICE`];
+  const serviceHostPort = process.env[`${service.toUpperCase()}`];
+  if (!serviceHostPort) {
+    throw new Error(`Service ${service} not found in .env file`);
+  }
   const [host, port] = serviceHostPort.split(':');
 
   const options: NestApplicationContextOptions & MicroserviceOptions = {
@@ -29,29 +87,26 @@ export const TCPConfig = async (
     options,
   );
 };
-export const TCPProvider = (service: string) => {
-  return {
-    provide: service,
-    useFactory: (configService: ConfigService) => {
-      const serviceHostPort = configService.get<string>(
-        `${service.toUpperCase()}_SERVICE`,
-      );
-      const [host, port] = serviceHostPort.split(':');
+export const TCPProvider = (service: string) => ({
+  provide: service,
+  useFactory: () => {
+    const serviceHostPort = process.env[service];
+    if (!serviceHostPort) {
+      throw new Error(`Environment variable ${service} is not defined`);
+    }
+    const [host, port] = serviceHostPort.split(':');
 
-      const options: ClientOptions = {
-        transport: Transport.TCP,
-        options: {
-          host,
-          port: +port,
-        },
-      };
+    const options: ClientOptions = {
+      transport: Transport.TCP,
+      options: {
+        host,
+        port: +port, // Convert port to number
+      },
+    };
 
-      return ClientProxyFactory.create(options);
-    },
-    inject: [ConfigService],
-  };
-};
-// export const TCPPrwovider1 = (service: string) => {
+    return ClientProxyFactory.create(options);
+  },
+}); // export const TCPPrwovider1 = (service: string) => {
 //   return {
 //     provide: service,
 //     useFactory: (configService: ConfigService) => {

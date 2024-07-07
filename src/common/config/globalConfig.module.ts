@@ -1,22 +1,19 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 
+@Global()
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: '.env',
       validationSchema: Joi.object({
         NODE_ENV: Joi.string()
           .valid('development', 'production', 'test', 'provision')
           .default('development'),
-        PORT: Joi.number().port().default(3000),
-        DATABASE_URL: Joi.string().required(), // Ensure DATABASE_URL is required
+        SECRET: Joi.string(),
+        DATABASE_URL: Joi.string(),
       }),
-      // validationOptions: {
-      //   allowUnknown: false,
-      //   abortEarly: true,
-      // },
+      isGlobal: true,
     }),
   ],
 })
