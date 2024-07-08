@@ -20,14 +20,6 @@ interface IJwtPayload {
   type: EUserType;
 }
 
-interface SendRequestParams<T> {
-  data: T;
-  user?: IJwtPayload | null;
-  service: string;
-  cmd: string;
-  client: ClientProxy;
-}
-
 interface ITCPPayload<T> {
   data: T;
   user: IJwtPayload;
