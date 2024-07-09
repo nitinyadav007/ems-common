@@ -8,8 +8,6 @@ export class BaseSchema {
   createdBy: Types.ObjectId;
   @Prop({ type: SchemaTypes.ObjectId, required: true })
   updatedBy: Types.ObjectId;
-  @Prop({ default: false })
-  isDeleted: boolean;
   @Prop({ type: Date, default: Date.now })
   deletedAt: Date;
   @Prop({ type: Date, default: Date.now })
