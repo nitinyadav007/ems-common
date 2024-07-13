@@ -11,17 +11,17 @@ import { NestApplicationContextOptions } from '@nestjs/common/interfaces/nest-ap
 import { timeout } from 'rxjs';
 import { Types } from 'mongoose';
 
-enum EUserType {
+export enum EUserType {
   ADMIN = 'admin',
   USER = 'user',
 }
 
-interface IJwtPayload {
+export interface IJwtPayload {
   sub: Types.ObjectId;
   type: EUserType;
 }
 
-interface ITCPPayload<T> {
+export interface ITCPPayload<T> {
   data: T;
   user: IJwtPayload;
 }
