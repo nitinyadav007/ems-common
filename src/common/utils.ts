@@ -9,6 +9,7 @@ import { BadRequestException, INestMicroservice } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestApplicationContextOptions } from '@nestjs/common/interfaces/nest-application-context-options.interface';
 import { timeout } from 'rxjs';
+import { Types } from 'mongoose';
 
 enum EUserType {
   ADMIN = 'admin',
@@ -16,7 +17,7 @@ enum EUserType {
 }
 
 interface IJwtPayload {
-  sub: string;
+  sub: Types.ObjectId;
   type: EUserType;
 }
 
