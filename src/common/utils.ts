@@ -26,6 +26,23 @@ export interface ITCPPayload<T> {
   user: IJwtPayload;
 }
 
+export const findAllResult = (data: any) => {
+  return {
+    docs: data.docs,
+    paginate: {
+      perPage: data.limit,
+      page: data.page,
+      totalDocs: data.totalDocs,
+      totalPages: data.totalPages,
+      pagingCounter: data.pagingCounter,
+      hasPrevPage: data.hasPrevPage,
+      hasNextPage: data.hasNextPage,
+      prevPage: data.prevPage,
+      nextPage: data.nextPage,
+    },
+  };
+};
+
 export async function sendRequest<T, U>(
   cmd: string,
   data: U,
