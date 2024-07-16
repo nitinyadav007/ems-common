@@ -26,6 +26,12 @@ export interface ITCPPayload<T> {
   user: IJwtPayload;
 }
 
+export const siFilter = (user: IJwtPayload) => {
+  return {
+    createdBy: user.sub,
+    updatedBy: user.sub,
+  };
+};
 export const findAllResult = (data: any) => {
   return {
     docs: data.docs,
@@ -66,7 +72,7 @@ export async function sendRequest<T, U>(
         user,
       );
       throw new BadRequestException({
-        message: 'Server Error',
+        message: `Cannot send request to ${service} service.`,
         code: 500,
         service: service,
         cmd: cmd,
