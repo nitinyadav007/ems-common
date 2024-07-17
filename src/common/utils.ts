@@ -9,7 +9,7 @@ import { BadRequestException, INestMicroservice } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestApplicationContextOptions } from '@nestjs/common/interfaces/nest-application-context-options.interface';
 import { timeout } from 'rxjs';
-import { Types } from 'mongoose';
+import { PaginateModel, PaginateResult, Types } from 'mongoose';
 
 export enum EUserType {
   ADMIN = 'admin',
@@ -24,6 +24,21 @@ export interface IJwtPayload {
 export interface ITCPPayload<T> {
   data: T;
   user: IJwtPayload;
+}
+
+export async function paginator<T>(
+  query: any,
+  data: any,
+  model: PaginateModel<T>, // Ensure to import and use Mongoose's Model interface
+): Promise<PaginateResult<T>> {
+  const { page, limit, projection, sortBy } = data;
+  const sortOptions = sortBy ? sortBy : { createdAt: -1 };
+  return await model.paginate(query, {
+    page,
+    limit,
+    sort: sortOptions,
+    select: projection,
+  });
 }
 
 export const siFilter = (user: IJwtPayload) => {
