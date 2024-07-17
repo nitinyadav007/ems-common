@@ -9,6 +9,7 @@ import { BadRequestException, INestMicroservice } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestApplicationContextOptions } from '@nestjs/common/interfaces/nest-application-context-options.interface';
 import { timeout } from 'rxjs';
+// @ts-ignore
 import { PaginateModel, PaginateResult, Types } from 'mongoose';
 
 export enum EUserType {
