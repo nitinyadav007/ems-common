@@ -42,6 +42,69 @@ export async function paginator<T>(
   });
 }
 
+//export const paginator = <
+//  T,
+//  U extends Pick<
+//  QueryusersArgs,
+//  'sortBy' | 'perPage' | 'page' | 'deleted' | 'groupBy' | 'projection'
+//  >,
+// >(
+//  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+//  model: any /*mongoose.PaginateModel<T>*/,
+//  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+//  query: QueryOptions,
+//  data: U,
+// ): any => {
+//  let customFind = 'find'
+//  if (data?.deleted === 'include') {
+//  customFind = 'findWithDeleted'
+//  } else if (data?.deleted === 'only') {
+//  customFind = 'findDeleted'
+//  }
+//  let sort = {
+//  createdAt: 'desc',
+//  }
+//  if (data?.sortBy && data.sortBy?.createdAt) {
+//  sort = data.sortBy
+//  } else if (data?.sortBy) {
+//  sort = {
+//  ...data.sortBy,
+//  createdAt: 'desc',
+//  }
+//  }
+//
+//  return {
+//  page: data.page,
+//  limit: data.perPage,
+//  projection: data.projection ?? defaultProjection,
+//  sort,
+//  ...(data?.perPage && { limit: data.perPage }),
+//  ...(data?.page && { page: data.page }),
+//  ...(customFind === 'findWithDeleted' && {
+//  customFind,
+//  useCustomCountFn: async (): Promise<number> => {
+//  return model.countDocumentsWithDeleted(query)
+//  },
+//  }),
+//  ...(customFind === 'findDeleted' && {
+//  customFind,
+//  useCustomCountFn: async (): Promise<number> => {
+//  return model.countDocumentsDeleted(query)
+//  },
+//  }),
+//  ...(customFind === 'find' && {
+//  customFind,
+//  useCustomCountFn: async (): Promise<number> => {
+//  return model.countDocuments(query)
+//  },
+//  }),
+//
+//  customFind,
+//  customLabels: {
+//  meta: 'paginator',
+//  },
+//  }
+// }
 export const siFilter = (user: IJwtPayload) => {
   return {
     createdBy: user.sub,
@@ -88,7 +151,7 @@ export async function sendRequest<T, U>(
         user,
       );
       throw new BadRequestException({
-        message: `Cannot send request to ${service} service.`,
+        message: e.message || `Cannot send request to ${service} service.`,
         code: 500,
         service: service,
         cmd: cmd,
