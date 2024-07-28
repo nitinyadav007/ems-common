@@ -7,3 +7,4 @@ export const R_A_S_E = 'Fail to restore the Record!';
 
 export const USERS_SERVICE = 'USERS_SERVICE';
 export const AUTH_SERVICE = 'AUTH_SERVICE';
+export const EXPENSE_SERVICE = 'EXPENSE_SERVICE';
